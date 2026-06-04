@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kasir Ayam Lodho</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+<body>
+
+<div style="text-align:center;">
+  <img src="logoo ayam lodho.jpeg"
+     style="width:350px; height:auto;">
+</div>
+
+<h2 style="text-align:center;">✪ INPUT TRANSAKSI ✪</h2>
+
+<div style="text-align:center; margin-top:30px;">
+
+  <!-- MODE -->
+  <select id="mode" style="padding:8px; margin-bottom:15px;">
+    <option value="transaksi">Transaksi</option>
+    <option value="pengeluaran">Pengeluaran</option>
+  </select>
+
+  <br>
+
+  <!-- FORM TRANSAKSI -->
+  <div id="formTransaksi">
+
+    <input type="date" id="tanggal" style="padding:8px; width:230px;">
+    <br><br>
+
+    <select id="menu" style="width:250px; padding:8px;">
+      <option value="">PILIH MENU</option>
+      <option>Paket Satu Porsi Reguler</option>
+      <option>Paket Satu Porsi Medium</option>
+      <option>Paket Satu Porsi Super</option>
+      <option>Ayam Satu Ekor Reguler</option>
+      <option>Ayam Satu Ekor Medium</option>
+      <option>Ayam Satu Ekor Super</option>
+      <option>Ayam Satu Potong Reguler</option>
+      <option>Ayam Satu Potong Medium</option>
+      <option>Ayam Satu Potong Super</option>
+      <option>Paket Spesial Reguler</option>
+      <option>Paket Spesial Medium</option>
+      <option>Paket Spesial Super</option>
+      <option>Paket Ayam Lodho Goreng Reguler</option>
+      <option>Paket Ayam Lodho Goreng Medium</option>
+      <option>Paket Ayam Lodho Goreng Super</option>
+      <option>Paket Satu Kotak Reguler</option>
+      <option>Paket Satu Kotak Medium</option>
+      <option>Paket Satu Kotak Super</option>
+      <option>Urap-Urap</option>
+      <option>Paket Ati Ampela Goreng 2 Biji</option>
+      <option>Paket Ati Ampela Goreng 3 Biji</option>
+      <option>Paket Ati Ampela Goreng 4 Biji</option>
+      <option>Ati Ampela Goreng 2 Biji</option>
+      <option>Ati Ampela Goreng 3 Biji</option>
+      <option>Ati Ampela Goreng 4 Biji</option>
+      <option>Paket Bancaan Reguler</option>
+      <option>Paket Bancaan Medium</option>
+      <option>Paket Bancaan Super</option>
+      <option>Porsi Bancaan Reguler</option>
+      <option>Porsi Bancaan Medium</option>
+      <option>Porsi Bancaan Super</option>
+      <option>Nasi Gurih Putih</option>
+      <option>Nasi Putih</option>
+      <option>Kuah</option>
+      <option>Teh Hangat</option>
+      <option>Es Teh</option>
+      <option>Jeruk Hangat</option>
+      <option>Es Jeruk</option>
+      <option>Kopi Hitam</option>
+      <option>Jahe Hangat</option>
+      <option>Mineral</option>
+    </select>
+
+    <br><br>
+
+    <input type="number" id="qty" placeholder="Qty" style="width:230px; padding:8px;">
+
+    <br><br>
+
+    <p id="preview" style="font-weight:bold; font-size:18px;"></p>
+
+    <br>
+
+    <button onclick="tambahItem()">➕ Tambah</button>
+
+    <br><br>
+
+    <div id="keranjang"></div>
+
+    <br>
+<button type="button" onclick="downloadStruk(); return false;">
+  
+  🧾 Download Struk
+</button>
+
+    <br>
+
+    <button onclick="kirim()">💾 Simpan Transaksi</button>
+
+  </div>
+
+  <!-- FORM PENGELUARAN -->
+<div id="formPengeluaran" style="display:none;">
+
+  <input type="date" id="tanggalPengeluaran" style="padding:8px; width:250px;">
+  <br><br>
+
+  <input type="text" id="ket" placeholder="Keterangan (contoh: beli LPG)" style="padding:8px; width:250px;">
+  <br><br>
+
+  <input type="number" id="nominal" placeholder="Nominal" style="padding:8px; width:250px;">
+  <br><br>
+
+  <input type="text" id="barang" placeholder="Nama barang (opsional stok)" style="padding:8px; width:250px;">
+  <br><br>
+
+  <input type="number" id="jumlah" placeholder="Jumlah barang" style="padding:8px; width:250px;">
+  <br><br>
+
+  <button onclick="tambahPengeluaran()">
+  ➕ Tambah Pengeluaran
+  </button>
+
+  <br><br>
+
+  <div id="listPengeluaran"></div>
+
+  <br>
+
+  <button onclick="kirim()">💾 Simpan Pengeluaran</button>
+
+</div>
+
+</div>
+
+<script>
+
+// SWITCH MODE
+document.getElementById("mode").addEventListener("change", function() {
+  let mode = this.value;
+
+  document.getElementById("formTransaksi").style.display =
+    mode === "transaksi" ? "block" : "none";
+
+  document.getElementById("formPengeluaran").style.display =
+    mode === "pengeluaran" ? "block" : "none";
+});
+
+// KERANJANG
+let keranjang = [];
+let keranjangPengeluaran = [];
+
+// HARGA
+const hargaMenu = {
+  "Paket Satu Porsi Reguler": 35000,
+  "Paket Satu Porsi Medium": 38000,
+  "Paket Satu Porsi Super": 40000,
+
+  "Ayam Satu Ekor Reguler": 100000,
+  "Ayam Satu Ekor Medium": 110000,
+  "Ayam Satu Ekor Super": 120000,
+
+  "Ayam Satu Potong Reguler": 25000,
+  "Ayam Satu Potong Medium": 28000,
+  "Ayam Satu Potong Super": 30000,
+
+  "Paket Spesial Reguler": 135000,
+  "Paket Spesial Medium": 145000,
+  "Paket Spesial Super": 155000,
+
+  "Paket Ayam Lodho Goreng Reguler": 35000,
+  "Paket Ayam Lodho Goreng Medium": 38000,
+  "Paket Ayam Lodho Goreng Super": 40000,
+
+  "Paket Satu Kotak Reguler": 37000,
+  "Paket Satu Kotak Medium": 40000,
+  "Paket Satu Kotak Super": 42000,
+
+  "Paket Ati Ampela Goreng 2 Biji": 15000,
+  "Paket Ati Ampela Goreng 3 Biji": 20000,
+  "Paket Ati Ampela Goreng 4 Biji": 25000,
+
+  "Ati Ampela Goreng 2 Biji": 10000,
+  "Ati Ampela Goreng 3 Biji": 15000,
+  "Ati Ampela Goreng 4 Biji": 20000,
+
+  "Paket Bancaan Reguler": 163000,
+  "Paket Bancaan Medium": 173000,
+  "Paket Bancaan Super": 183000,
+
+  "Porsi Bancaan Reguler": 22000,
+  "Porsi Bancaan Medium": 24000,
+  "Porsi Bancaan Super": 25000,
+
+  "Urap-Urap": 7000,
+  "Nasi Gurih Putih": 7000,
+  "Nasi Putih": 5000,
+  "Kuah": 10000,
+
+  "Teh Hangat": 5000,
+  "Es Teh": 5000,
+  "Jeruk Hangat": 8000,
+  "Es Jeruk": 8000,
+  "Kopi Hitam": 8000,
+  "Jahe Hangat": 8000,
+  "Mineral": 5000,
+};
+
+// PREVIEW
+document.getElementById("qty").addEventListener("input", preview);
+document.getElementById("menu").addEventListener("change", preview);
+
+function preview() {
+  let menu = document.getElementById("menu").value;
+  let qty = parseInt(document.getElementById("qty").value);
+
+  if (!menu || !qty) {
+    document.getElementById("preview").innerText = "";
+    return;
+  }
+
+  let harga = hargaMenu[menu];
+
+  if (!harga) {
+    document.getElementById("preview").innerText = "Harga tidak ditemukan";
+    return;
+  }
+
+  let total = harga * qty;
+
+  document.getElementById("preview").innerText =
+    "Total: Rp " + total.toLocaleString("id-ID");
+}
+
+// TAMBAH ITEM
+function tambahItem() {
+  let menu = document.getElementById("menu").value;
+  let qty = document.getElementById("qty").value;
+
+  if (!menu || !qty) return alert("Isi dulu!");
+
+  let harga = hargaMenu[menu];
+  let total = harga * qty;
+
+  keranjang.push({ menu, qty, harga, total });
+
+  tampilkanKeranjang();
+
+  document.getElementById("qty").value = "";
+  document.getElementById("preview").innerText = "";
+}
+
+// TAMPILKAN
+function tampilkanKeranjang() {
+  let html = "";
+  let grandTotal = 0;
+
+  keranjang.forEach((item, i) => {
+    html += `${i+1}. ${item.menu} x${item.qty} = Rp ${item.total.toLocaleString("id-ID")} <br>`;
+    grandTotal += item.total;
+  });
+
+  html += "<hr><b>Total: Rp " + grandTotal.toLocaleString("id-ID") + "</b>";
+  document.getElementById("keranjang").innerHTML = html;
+}
+
+function tambahPengeluaran() {
+
+  let tanggal = document.getElementById("tanggalPengeluaran").value;
+  let keterangan = document.getElementById("ket").value;
+  let nominal = document.getElementById("nominal").value;
+  let barang = document.getElementById("barang").value;
+  let jumlah = document.getElementById("jumlah").value;
+
+  if (!keterangan || !nominal) {
+    alert("Isi keterangan dan nominal!");
+    return;
+  }
+
+  keranjangPengeluaran.push({
+    tanggal,
+    keterangan,
+    nominal: parseInt(nominal),
+    barang,
+    jumlah
+  });
+
+  tampilkanPengeluaran();
+
+  document.getElementById("ket").value = "";
+  document.getElementById("nominal").value = "";
+  document.getElementById("barang").value = "";
+  document.getElementById("jumlah").value = "";
+}
+
+function tampilkanPengeluaran() {
+
+  let html = "";
+  let total = 0;
+
+  keranjangPengeluaran.forEach((item, i) => {
+
+    html += `
+      ${i+1}. ${item.keterangan}
+      - Rp ${item.nominal.toLocaleString("id-ID")}
+      <br>
+    `;
+
+    total += item.nominal;
+  });
+
+  html += `
+    <hr>
+    <b>Total Pengeluaran:
+    Rp ${total.toLocaleString("id-ID")}</b>
+  `;
+
+  document.getElementById("listPengeluaran").innerHTML = html;
+}
+
+async function downloadStruk() {
+
+  if (keranjang.length === 0) {
+    alert("Tidak ada transaksi!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let y = 10;
+  let total = 0;
+
+  // JUDUL
+  doc.setFont("courier", "bold");
+  doc.text("AYAM LODHO PAK YUSUF CABANG SURABAYA", 105, y, { align: "center" });
+  y += 8;
+
+  let tanggal = new Date().toLocaleString("id-ID");
+  doc.setFont("courier", "normal");
+  doc.text(tanggal, 105, y, { align: "center" });
+  y += 10;
+
+  doc.text("-----------------------------", 10, y);
+  y += 8;
+
+  // ITEM
+  keranjang.forEach(item => {
+    doc.text(item.menu, 10, y);
+    y += 6;
+
+    let line = `${item.qty} x Rp ${item.harga.toLocaleString("id-ID")} = Rp ${item.total.toLocaleString("id-ID")}`;
+    doc.text(line, 10, y);
+    y += 8;
+
+    total += item.total;
+  });
+
+  doc.text("-----------------------------", 10, y);
+  y += 8;
+
+  // TOTAL
+  doc.setFont("courier", "bold");
+  doc.text(`Total: Rp ${total.toLocaleString("id-ID")}`, 10, y);
+  y += 10;
+
+  doc.setFont("courier", "normal");
+  doc.text("Terima kasih", 105, y, { align: "center" });
+
+  // AUTO DOWNLOAD PDF
+  doc.save("struk_ayam_lodho.pdf");
+}
+
+// KIRIM
+async function kirim() {
+
+  let mode = document.getElementById("mode").value;
+
+  // ================= TRANSAKSI =================
+  if (mode === "transaksi") {
+
+    if (keranjang.length === 0) {
+      alert("Keranjang kosong!");
+      return;
+    }
+
+    let tanggal = document.getElementById("tanggal").value;
+
+    for (let item of keranjang) {
+      await fetch("https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          mode: "transaksi",
+          tanggal: tanggal,
+          menu: item.menu,
+          qty: item.qty,
+          harga: item.harga,
+          total: item.total
+        })
+      });
+    }
+
+    alert("Transaksi berhasil");
+    keranjang = [];
+    document.getElementById("keranjang").innerHTML = "";
+  }
+
+  // ================= PENGELUARAN =================
+if (mode === "pengeluaran") {
+
+  if (keranjangPengeluaran.length === 0) {
+    alert("Keranjang pengeluaran kosong!");
+    return;
+  }
+
+  for (let item of keranjangPengeluaran) {
+
+    await fetch("https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        mode: "pengeluaran",
+        tanggal: item.tanggal,
+        keterangan: item.keterangan,
+        nominal: item.nominal,
+        nama_barang: item.barang,
+        jumlah: item.jumlah
+      })
+    });
+
+  }
+
+  alert("Semua pengeluaran berhasil disimpan");
+
+  keranjangPengeluaran = [];
+  document.getElementById("listPengeluaran").innerHTML = "";
+}
+}
+
+</script>
+
+</body>
+</html> 
