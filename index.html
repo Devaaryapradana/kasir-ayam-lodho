@@ -2,15 +2,22 @@
 <html>
 <head>
   <title>Kasir Ayam Lodho</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 <body>
 
+<div style="
+max-width:500px;
+margin:auto;
+padding:15px;
+">
+
 <div style="text-align:center;">
   <img src="logoo ayam lodho.jpeg"
-     style="width:350px; height:auto;">
+  style="width:100%; max-width:400px; height:auto;">
 </div>
 
 <h2 style="text-align:center;">✪ INPUT TRANSAKSI ✪</h2>
@@ -28,10 +35,21 @@
   <!-- FORM TRANSAKSI -->
   <div id="formTransaksi">
 
-    <input type="date" id="tanggal" style="padding:8px; width:230px;">
+    <input type="date"
+    id="tanggal"
+    style="
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+    ">
     <br><br>
 
-    <select id="menu" style="width:250px; padding:8px;">
+    <select id="menu"
+    style="
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+    ">
       <option value="">PILIH MENU</option>
       <option>Paket Satu Porsi Reguler</option>
       <option>Paket Satu Porsi Medium</option>
@@ -78,7 +96,14 @@
 
     <br><br>
 
-    <input type="number" id="qty" placeholder="Qty" style="width:230px; padding:8px;">
+    <input type="number"
+    id="qty"
+    placeholder="Qty"
+    style="
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+    ">
 
     <br><br>
 
@@ -100,26 +125,50 @@
 
     <br>
 
-    <button onclick="kirim()">💾 Simpan Transaksi</button>
+    <button onclick="kirim()"
+    style="
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    margin-top:10px;
+    ">
+    💾 Simpan Transaksi
+    </button>
 
   </div>
 
   <!-- FORM PENGELUARAN -->
 <div id="formPengeluaran" style="display:none;">
 
-  <input type="date" id="tanggalPengeluaran" style="padding:8px; width:250px;">
+  <input type="date" id="tanggalPengeluaran" 
+  style="
+  width:100%;
+  padding:12px;
+  box-sizing:border-box;">
   <br><br>
 
-  <input type="text" id="ket" placeholder="Keterangan (contoh: beli LPG)" style="padding:8px; width:250px;">
+  <input type="text" id="ket" placeholder="Keterangan (contoh: beli LPG)" 
+  style="width:100%;
+  padding:12px;
+  box-sizing:border-box;">
   <br><br>
 
-  <input type="number" id="nominal" placeholder="Nominal" style="padding:8px; width:250px;">
+  <input type="number" id="nominal" placeholder="Nominal" 
+  style="width:100%;
+  padding:12px;
+  box-sizing:border-box;">
   <br><br>
 
-  <input type="text" id="barang" placeholder="Nama barang (opsional stok)" style="padding:8px; width:250px;">
+  <input type="text" id="barang" placeholder="Nama barang (opsional stok)" 
+  style="width:100%;
+  padding:12px;
+  box-sizing:border-box;">
   <br><br>
 
-  <input type="number" id="jumlah" placeholder="Jumlah barang" style="padding:8px; width:250px;">
+  <input type="number" id="jumlah" placeholder="Jumlah barang" 
+  style="width:100%;
+  padding:12px;
+  box-sizing:border-box;">
   <br><br>
 
   <button onclick="tambahPengeluaran()">
@@ -265,7 +314,21 @@ function tampilkanKeranjang() {
     grandTotal += item.total;
   });
 
-  html += "<hr><b>Total: Rp " + grandTotal.toLocaleString("id-ID") + "</b>";
+  html += `
+  <div style="
+  background:#ffe082;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+  font-size:24px;
+  font-weight:bold;
+  ">
+  TOTAL
+  <br>
+  Rp ${grandTotal.toLocaleString("id-ID")}
+  </div>
+  `;
+  
   document.getElementById("keranjang").innerHTML = html;
 }
 
@@ -315,9 +378,18 @@ function tampilkanPengeluaran() {
   });
 
   html += `
-    <hr>
-    <b>Total Pengeluaran:
-    Rp ${total.toLocaleString("id-ID")}</b>
+  <div style="
+  background:#ffe082;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+  font-size:24px;
+  font-weight:bold;
+  ">
+  TOTAL PENGELUARAN
+  <br>
+  Rp ${grandTotal.toLocaleString("id-ID")}
+  </div>
   `;
 
   document.getElementById("listPengeluaran").innerHTML = html;
@@ -442,6 +514,8 @@ if (mode === "pengeluaran") {
 }
 
 </script>
+
+</div>
 
 </body>
 </html> 
