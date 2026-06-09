@@ -129,25 +129,6 @@ padding:15px;
 
     <div id="keranjang"></div>
 
-    <br>
-  <button
-  type="button"
-  onclick="downloadStruk(); return false;"
-  style="
-    width:100%;
-    max-width:500px;
-    padding:14px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    margin-top:10px;
-  ">
-    🧾 Download Struk
-  </button>
-
-    <br>
-
     <button onclick="kirim()"
     style="
     width:100%;
@@ -155,7 +136,7 @@ padding:15px;
     font-size:16px;
     margin-top:10px;
     ">
-    💾 Simpan Transaksi
+    💾 Simpan & Cetak Transaksi
     </button>
 
   </div>
@@ -518,6 +499,9 @@ async function kirim() {
     }
 
     alert("Transaksi berhasil");
+
+    downloadStruk(); // otomatis cetak/download struk
+
     keranjang = [];
     document.getElementById("keranjang").innerHTML = "";
   }
