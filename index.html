@@ -469,6 +469,50 @@ async function downloadStruk() {
   doc.save("struk_ayam_lodho.pdf");
 }
 
+function cetakRawBT() {
+
+  if (keranjang.length === 0) {
+    alert("Tidak ada transaksi!");
+    return;
+  }
+
+  let total = 0;
+
+  let struk = "";
+  struk += "AYAM LODHO PAK YUSUF\n";
+  struk += "CABANG SURABAYA\n";
+  struk += "====================\n";
+
+  struk += new Date().toLocaleString("id-ID") + "\n";
+  struk += "====================\n";
+
+  keranjang.forEach(item => {
+
+    struk += item.menu + "\n";
+
+    struk +=
+      item.qty +
+      " x Rp " +
+      item.harga.toLocaleString("id-ID") +
+      " = Rp " +
+      item.total.toLocaleString("id-ID") +
+      "\n";
+
+    total += item.total;
+
+  });
+
+  struk += "====================\n";
+  struk += "TOTAL : Rp " + total.toLocaleString("id-ID") + "\n";
+  struk += "====================\n";
+  struk += "Terima Kasih\n\n\n";
+
+  // buka RawBT
+  window.location.href =
+    "rawbt:base64," + btoa(unescape(encodeURIComponent(struk)));
+
+}
+
 // KIRIM
 async function kirim() {
 
@@ -500,7 +544,7 @@ async function kirim() {
 
     alert("Transaksi berhasil");
 
-    downloadStruk(); // otomatis cetak/download struk
+    cetakRawBT(); // otomatis cetak/download struk
 
     keranjang = [];
     document.getElementById("keranjang").innerHTML = "";
