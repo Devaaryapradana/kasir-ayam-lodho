@@ -129,7 +129,7 @@ padding:15px;
 
     <div id="keranjang"></div>
 
-    <button id="btnSimpan" onclick="kirim()"
+    <button id="btnSimpanTransaksi" onclick="kirim()"
     style="
     width:100%;
     padding:12px;
@@ -195,7 +195,7 @@ padding:15px;
 
   <br>
 
-  <button onclick="kirim()" 
+  <button id="btnSimpanPengeluaran" onclick="kirim()" 
    style="
     width:100%;
     padding:12px;
@@ -523,7 +523,12 @@ async function kirim() {
 
   sedangMenyimpan = true;
 
-  let btn = document.getElementById("btnSimpan");
+  let mode = document.getElementById("mode").value;
+
+  let btn =
+    mode === "transaksi"
+      ? document.getElementById("btnSimpanTransaksi")
+      : document.getElementById("btnSimpanPengeluaran");
 
   try {
 
@@ -573,38 +578,43 @@ async function kirim() {
       document.getElementById("keranjang").innerHTML = "";
     }
 
-    // ================= PENGELUARAN =================
-    if (mode === "pengeluaran") {
+   // ================= PENGELUARAN =================
+if (mode === "pengeluaran") {
 
-      if (keranjangPengeluaran.length === 0) {
-        alert("Keranjang pengeluaran kosong!");
-        return;
+  if (keranjangPengeluaran.length === 0) {
+    alert("Keranjang pengeluaran kosong!");
+    return;
+  }
+
+  // Simpan data sementara
+  let dataPengeluaran = [...keranjangPengeluaran];
+
+  // Kosongkan keranjang lebih dulu (anti double klik)
+  keranjangPengeluaran = [];
+  document.getElementById("listPengeluaran").innerHTML = "";
+
+  // Kirim semua data ke Apps Script
+  for (let item of dataPengeluaran) {
+
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          mode: "pengeluaran",
+          tanggal: item.tanggal,
+          keterangan: item.keterangan,
+          nominal: item.nominal,
+          nama_barang: item.barang,
+          jumlah: item.jumlah
+        })
       }
+    );
 
-      for (let item of keranjangPengeluaran) {
+  }
 
-        await fetch(
-          "https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              mode: "pengeluaran",
-              tanggal: item.tanggal,
-              keterangan: item.keterangan,
-              nominal: item.nominal,
-              nama_barang: item.barang,
-              jumlah: item.jumlah
-            })
-          }
-        );
-
-      }
-
-      alert("Semua pengeluaran berhasil disimpan");
-
-      keranjangPengeluaran = [];
-      document.getElementById("listPengeluaran").innerHTML = "";
-    }
+  alert("Semua pengeluaran berhasil disimpan");
+}
 
   } catch (e) {
 
@@ -616,9 +626,16 @@ async function kirim() {
     sedangMenyimpan = false;
 
     if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = "💾 Simpan & Cetak Transaksi";
-    }
+
+  btn.disabled = false;
+
+  if (mode === "transaksi") {
+    btn.innerHTML = "💾 Simpan & Cetak Transaksi";
+  } else {
+    btn.innerHTML = "💾 Simpan Pengeluaran";
+  }
+
+}
 
   }
 
