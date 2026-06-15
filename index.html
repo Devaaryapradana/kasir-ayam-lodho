@@ -399,19 +399,19 @@ function tampilkanPengeluaran() {
   });
 
   html += `
-  <div style="
-  background:#ffe082;
-  padding:15px;
-  border-radius:10px;
-  margin-top:15px;
-  font-size:24px;
-  font-weight:bold;
-  ">
-  TOTAL PENGELUARAN
-  <br>
-  Rp ${grandTotal.toLocaleString("id-ID")}
-  </div>
-  `;
+<div style="
+background:#ffe082;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+font-size:24px;
+font-weight:bold;
+">
+TOTAL PENGELUARAN
+<br>
+Rp ${total.toLocaleString("id-ID")}
+</div>
+`;
 
   document.getElementById("listPengeluaran").innerHTML = html;
 }
