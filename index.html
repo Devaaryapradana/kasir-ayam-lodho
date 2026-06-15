@@ -129,7 +129,7 @@ padding:15px;
 
     <div id="keranjang"></div>
 
-    <button onclick="kirim()"
+    <button id="btnSimpan" onclick="kirim()"
     style="
     width:100%;
     padding:12px;
@@ -513,72 +513,115 @@ function cetakRawBT() {
 
 }
 
-// KIRIM
+let sedangMenyimpan = false;
+
 async function kirim() {
 
-  let mode = document.getElementById("mode").value;
-
-  // ================= TRANSAKSI =================
-  if (mode === "transaksi") {
-
-    if (keranjang.length === 0) {
-      alert("Keranjang kosong!");
-      return;
-    }
-
-    let tanggal = document.getElementById("tanggal").value;
-
-    for (let item of keranjang) {
-      await fetch("https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec", {
-        method: "POST",
-        body: JSON.stringify({
-          mode: "transaksi",
-          tanggal: tanggal,
-          menu: item.menu,
-          qty: item.qty,
-          harga: item.harga,
-          total: item.total
-        })
-      });
-    }
-
-    alert("Transaksi berhasil");
-
-    cetakRawBT(); // otomatis cetak/download struk
-
-    keranjang = [];
-    document.getElementById("keranjang").innerHTML = "";
-  }
-
-  // ================= PENGELUARAN =================
-if (mode === "pengeluaran") {
-
-  if (keranjangPengeluaran.length === 0) {
-    alert("Keranjang pengeluaran kosong!");
+  if (sedangMenyimpan) {
     return;
   }
 
-  for (let item of keranjangPengeluaran) {
+  sedangMenyimpan = true;
 
-    await fetch("https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec", {
-      method: "POST",
-      body: JSON.stringify({
-        mode: "pengeluaran",
-        tanggal: item.tanggal,
-        keterangan: item.keterangan,
-        nominal: item.nominal,
-        nama_barang: item.barang,
-        jumlah: item.jumlah
-      })
-    });
+  let btn = document.getElementById("btnSimpan");
+
+  try {
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Menyimpan...";
+    }
+
+    let mode = document.getElementById("mode").value;
+
+    // ================= TRANSAKSI =================
+    if (mode === "transaksi") {
+
+      if (keranjang.length === 0) {
+        alert("Keranjang kosong!");
+        return;
+      }
+
+      let tanggal = document.getElementById("tanggal").value;
+
+      for (let item of keranjang) {
+
+        await fetch(
+          "https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              mode: "transaksi",
+              tanggal: tanggal,
+              menu: item.menu,
+              qty: item.qty,
+              harga: item.harga,
+              total: item.total
+            })
+          }
+        );
+
+      }
+
+      alert("Transaksi berhasil");
+
+      // Cetak struk
+      cetakRawBT();
+
+      // Kosongkan keranjang
+      keranjang = [];
+      document.getElementById("keranjang").innerHTML = "";
+    }
+
+    // ================= PENGELUARAN =================
+    if (mode === "pengeluaran") {
+
+      if (keranjangPengeluaran.length === 0) {
+        alert("Keranjang pengeluaran kosong!");
+        return;
+      }
+
+      for (let item of keranjangPengeluaran) {
+
+        await fetch(
+          "https://script.google.com/macros/s/AKfycbylEnlSfwjjXX8ThA7GM3vAdoY5_4OQM8pRXh7EutmmjNet8OXk7LqBZ1zULCHYRbD_/exec",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              mode: "pengeluaran",
+              tanggal: item.tanggal,
+              keterangan: item.keterangan,
+              nominal: item.nominal,
+              nama_barang: item.barang,
+              jumlah: item.jumlah
+            })
+          }
+        );
+
+      }
+
+      alert("Semua pengeluaran berhasil disimpan");
+
+      keranjangPengeluaran = [];
+      document.getElementById("listPengeluaran").innerHTML = "";
+    }
+
+  } catch (e) {
+
+    console.error("Error saat menyimpan:", e);
+    alert("Gagal menyimpan data. Coba lagi.");
+
+  } finally {
+
+    sedangMenyimpan = false;
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = "💾 Simpan & Cetak Transaksi";
+    }
 
   }
 
-  alert("Semua pengeluaran berhasil disimpan");
-
-  keranjangPengeluaran = [];
-  document.getElementById("listPengeluaran").innerHTML = "";
-}
 }
 
 </script>
